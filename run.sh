@@ -1,11 +1,11 @@
 #!/bin/sh
-# imagemagick‚Å‰½‚©‰æ‘œˆ—‚ğ‚µ‚ÄC/imgproc‚É‚©‚«‚±‚İCƒeƒ“ƒvƒŒ[ƒgƒ}ƒbƒ`ƒ“ƒO
+# imagemagickã§ä½•ã‹ç”»åƒå‡¦ç†ã‚’ã—ã¦ï¼Œ/imgprocã«ã‹ãã“ã¿ï¼Œãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒãƒƒãƒãƒ³ã‚°
 for image in $1/test/*.ppm; do
     bname=`basename ${image}`
     name="imgproc/"$bname
     x=0    	#
     echo $name
-    convert "${image}" $name  # ‰½‚à‚µ‚È‚¢‰æ‘œˆ—
+    convert "${image}" $name  # ä½•ã‚‚ã—ãªã„ç”»åƒå‡¦ç†
 #   convert -blur 2x6 "${image}" "${name}"
 #    convert -median 3 "${image}" "${name}"
     rotation=0

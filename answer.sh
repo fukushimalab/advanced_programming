@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 # tolerance error
 POSITION_TOLERANCE_ERROR=0
 WIDHT_TOLERANCE_ERROR=0
@@ -36,6 +36,10 @@ for result in $1/*.txt; do
 		answer_hight=`cat ${answer} | awk '{print $5}'`
 		answer_rotation=`cat ${answer} | awk '{print $6}'`
 
+		if [ -z ${result_template_name} ] || [ -z "${result_x}" ] || [ -z "${result_y}" ] || [ -z "${result_width}" ] || [ -z "${result_hight}" ] || [ -z "${result_rotation}" ];  then
+			echo "[NOT CORRECT (IGNORE RESULT FILE)]"
+			continue
+		fi
 		if [ ${result_template_name} = ${answer_template_name} ]; then
 			x=`expr ${result_x} - ${answer_x}`
 			y=`expr ${result_y} - ${answer_y}`
