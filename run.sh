@@ -14,10 +14,10 @@ for image in $1/test/*.ppm; do
 	echo `basename ${template}`
 	if [ $x = 0 ]
 	then
-	    ./matching $name "${template}" rotation 0.5 cpg
+	    ./matching $name "${template}" rotation 0.5 cp
 	    x=1
 	else
-	    ./matching $name "${template}" rotation 0.5 pg
+	    ./matching $name "${template}" rotation 0.5 p
 	fi
     done
     echo ""
