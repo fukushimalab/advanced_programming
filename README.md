@@ -27,3 +27,7 @@ ImageMagickは簡単な画像処理を行う，コマンドラインベースの
 結果をチェック
 
  `sh answer.sh result level1`
+
+## ダウンロード方法
+
+![ダウンロード方法](./image/fig1.png "ダウンロード方法 ")
