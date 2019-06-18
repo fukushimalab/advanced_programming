@@ -3,6 +3,10 @@
 
 [説明資料（途中で読み込みが止まるので，右クリックしてダウンロードを推奨）](./advanced_programming_signal_processing.pdf)
 
+## memo for 来年
+* final用と練習用のlelveinfが同一．
+* level7がfinalのは未作成．
+
 ## 達成目標
 ある目的を達成するには，すべての機能を一つの言語だけでプログラムする必要はない．
 
