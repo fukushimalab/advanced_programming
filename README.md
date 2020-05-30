@@ -23,12 +23,14 @@ ImageMagickは簡単な画像処理を行う，コマンドラインベースの
 それぞれを工夫することで，最短時間で高い検出率を達成することを目指す．
 
 ## マニュアル
-テンプレートマッチングを実行
+1. makeでC言語プログラムのmatchingを生成
+
+2. テンプレートマッチングを実行
 ```shell
 time sh run.sh level1
 ```
 
-結果をチェック
+3. 結果をチェック
 
 ```shell
 sh answer.sh result level1
@@ -42,6 +44,7 @@ sh answer.sh result level1
 * advanced_programming_signal_processing
 	* 演習の本体
 	* advanced_programming_signal_processing.slnでmatching関数をVisual Studioでも編集できる．
+		* ソリューションのデバックには，この引数を指定してある．`imgproc/level1_000.ppm  level1/ocean_beach_kinzokutanchi.ppm 0 1.0 cp`
 	* ただし，make でコンパイルが基本
 * docs
 	* 説明用のパワーポイントやpdfファイルが入ってる
