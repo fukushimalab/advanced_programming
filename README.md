@@ -38,7 +38,7 @@ sh answer.sh result level1
 
 ## ダウンロード方法
 
-![ダウンロード方法](./image/fig1.png "ダウンロード方法 ")
+![ダウンロード方法](./docs/image/fig1.png "ダウンロード方法 ")
 
 ## ディレクトリ構成
 * advanced_programming_signal_processing
