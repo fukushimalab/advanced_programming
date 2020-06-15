@@ -1,0 +1,2 @@
+# templateMatching.sln
+データセットのジェネレータ
