@@ -44,7 +44,8 @@ sh answer.sh result level1
 * Makefileを編集コンパイルオプションの変更
 * run.shを編集して，ImageMagickやmatchingの引数を変更
 * main.cを編集してテンプレートマッチングの関数を変更
-変更ののち2～4の繰り返し．
+
+変更の後，2～4の繰り返し．
 
 ## ダウンロード方法
 
