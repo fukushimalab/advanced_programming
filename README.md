@@ -23,18 +23,29 @@ ImageMagickは簡単な画像処理を行う，コマンドラインベースの
 それぞれを工夫することで，最短時間で高い検出率を達成することを目指す．
 
 ## マニュアル
-1. makeでC言語プログラムのmatchingを生成
+1. advanced_programming_signal_processingdディレクトリに移動
+```shell
+cd advanced_programming_signal_processing
+```
 
-2. テンプレートマッチングを実行
+2. makeでC言語プログラムのmatchingを生成
+```shell
+make
+```
+3. level1のテンプレートマッチングを実行（1~7は演習次第でかえる）
 ```shell
 time sh run.sh level1
 ```
-
-3. 結果をチェック
-
+4. 結果をチェック
 ```shell
 sh answer.sh result level1
 ```
+5. ファイルの編集
+* Makefileを編集コンパイルオプションの変更
+* run.shを編集して，ImageMagickやmatchingの引数を変更
+* main.cを編集してテンプレートマッチングの関数を変更
+
+変更の後，2～4の繰り返し．
 
 ## ダウンロード方法
 
