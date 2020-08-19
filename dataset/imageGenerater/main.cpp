@@ -36,7 +36,7 @@ struct option {
 };
 
 //void embedImage(const cv::Mat src, cv::Mat& dest, const cv::Mat embeddedImage, const double angle, const double tx, const double ty)
-void embedImage(const cv::Mat src, cv::Mat& dest, const cv::Mat embeddedImage, const option op)
+void embedImage(const cv::Mat src, cv::Mat& dest, cv::Mat& embeddedImage, const option op)
 {
 	CV_Assert(!src.empty() && !embeddedImage.empty());
 
@@ -46,30 +46,28 @@ void embedImage(const cv::Mat src, cv::Mat& dest, const cv::Mat embeddedImage, c
 	const int tx = op.tx;
 	const int ty = op.ty;
 
+	Mat roi = dest(Rect(tx, ty, embeddedImage.cols, embeddedImage.rows));
 	if (angle != 0)
 	{
-		Point2d center(embeddedImage.cols / 2, embeddedImage.rows / 2);
-		Mat rotateMat = cv::getRotationMatrix2D(center, angle, 1.0); // 変換行列作成
-		rotateMat.at<double>(0, 2) += tx; // オフセット足す
-		rotateMat.at<double>(1, 2) += ty;
-		warpAffine(embeddedImage, dest, rotateMat, dest.size(), cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+		Mat rotated;
+		cv::rotate(embeddedImage, rotated, angle / 90 - 1); // 90:0, 180:1, 270:2を指定
+		if (angle != 180)
+			roi = dest(Rect(tx, ty, rotated.cols, rotated.rows));
+		rotated.copyTo(roi);
+		embeddedImage = rotated.clone();
 	}
-	else
-	{
-		Mat roi = dest(Rect(tx, ty, embeddedImage.cols, embeddedImage.rows));
-		if (embeddedImage.channels() == 4) {
-			vector<Mat> p;
-			split(embeddedImage, p);
-			// アルファチャンネルでマスク画像生成
-			Mat mask = p[3],emb;
-			p.pop_back();
-			// それ以外でRGB画像
-			cv::merge(p, emb);
-			emb.copyTo(roi, mask);
-		}
-		else {
-			embeddedImage.copyTo(roi);
-		}
+	else if (embeddedImage.channels() == 4) {
+		vector<Mat> p;
+		split(embeddedImage, p);
+		// アルファチャンネルでマスク画像生成
+		Mat mask = p[3], emb;
+		p.pop_back();
+		// それ以外でRGB画像
+		cv::merge(p, emb);
+		emb.copyTo(roi, mask);
+	}
+	else {
+		embeddedImage.copyTo(roi);
 	}
 }
 
@@ -97,7 +95,7 @@ void outputText(string outputFilename, string embeddedImageName, int tx, int ty,
 	output << embeddedImageName << " " << x << " " << y << " " << embedImage.cols << " " << embedImage.rows << " " << angle << flush;
 }
 
-void generateImage(const Mat src, Mat& dest, const Mat embeddedImage, option op, bool isSeamless = false)
+void generateImage(const Mat src, Mat& dest, Mat embeddedImage, option op, bool isSeamless = false)
 {
 	CV_Assert(!src.empty() && !embeddedImage.empty());
 
@@ -137,7 +135,7 @@ void generateImage(const Mat src, Mat& dest, const Mat embeddedImage, option op,
 }
 
 // レベルInf作成用(エラー未修正)
-void generateImageLvInf(const Mat src, Mat& dest, const Mat embeddedImage,Mat& temp, int& angle,int& tx,int& ty)
+void generateImageLvInf(const Mat src, Mat& dest, const Mat embeddedImage, Mat& temp, int& angle, int& tx, int& ty)
 {
 	CV_Assert(!src.empty() && !embeddedImage.empty());
 
@@ -171,7 +169,7 @@ void generateImageLvInf(const Mat src, Mat& dest, const Mat embeddedImage,Mat& t
 	if (magnification_ == 0)
 	{
 		magnification = 0.5;
-		resize(temp, temp, Size(magnification*temp.cols, magnification*temp.rows));
+		resize(temp, temp, Size(magnification * temp.cols, magnification * temp.rows));
 	}
 	else if (magnification_ == 1)
 	{
@@ -181,13 +179,13 @@ void generateImageLvInf(const Mat src, Mat& dest, const Mat embeddedImage,Mat& t
 	else if (magnification_ == 2)
 	{
 		magnification = 2.f;
-		resize(temp, temp, Size(magnification*temp.cols, magnification*temp.rows));
+		resize(temp, temp, Size(magnification * temp.cols, magnification * temp.rows));
 	}
 
 	tx = (rand() + 0.f) / RAND_MAX * (src.cols - embeddedImage.cols * 2) + embeddedImage.cols;
 	ty = (rand() + 0.f) / RAND_MAX * (src.rows - embeddedImage.rows * 2) + embeddedImage.rows;
 
-	const Mat src_mask =  255 * Mat::ones(temp.rows, temp.cols, temp.depth());
+	const Mat src_mask = 255 * Mat::ones(temp.rows, temp.cols, temp.depth());
 	const Point center(tx, ty);
 	//seamlessClone(temp, src, src_mask, center, dest, NORMAL_CLONE);
 	seamlessClone(temp, src, src_mask, center, dest, MIXED_CLONE);
@@ -257,7 +255,7 @@ int main(int argc, char** argv)
 	temp_names.push_back("airgun_women_syufu");
 
 	// level 1 : 単一画像埋め込み
-	if (true) {
+	if (false) {
 		const int level = 1;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -273,7 +271,7 @@ int main(int argc, char** argv)
 			option op;
 			op.angle = 0; // 角度0
 			// 埋め込み座標ランダム
-			op.tx = (rand() + 0.f) / RAND_MAX* (src.cols - embeddedImage.cols);
+			op.tx = (rand() + 0.f) / RAND_MAX * (src.cols - embeddedImage.cols);
 			op.ty = (rand() + 0.f) / RAND_MAX * (src.rows - embeddedImage.rows);
 
 			embedImage(src, dest, embeddedImage, op);
@@ -287,7 +285,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 2 : 単一画像埋め込み，インパルスノイズ付与
-	if (true) {
+	if (false) {
 		const int level = 2;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -320,7 +318,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 3 : 単一画像埋め込み，コントラスト変化(0.5,1.0,1.5,2.0)
-	if (true) {
+	if (false) {
 		const int level = 3;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -354,7 +352,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 4 : 単一画像埋め込み，テンプレート背景透過
-	if (true) {
+	if (false) {
 		const int level = 4;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -384,7 +382,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 5 : 単一画像埋め込み，テンプレートリサイズ(0.5,1.0,2.0)
-	if (true) {
+	if (false) {
 		const int level = 5;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -417,7 +415,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 6 : 単一画像埋め込み，テンプレート回転(0,90,180,270)
-	if (true) {
+	if (false) {
 		const int level = 6;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -432,9 +430,11 @@ int main(int argc, char** argv)
 
 			option op;
 			op.angle = 90 * (rand() % 4); // 角度
-			// 埋め込み座標ランダム
-			op.tx = (rand() + 0.f) / RAND_MAX * (src.cols - embeddedImage.cols);
-			op.ty = (rand() + 0.f) / RAND_MAX * (src.rows - embeddedImage.rows);
+			// 埋め込み座標ランダム (回転するので，併進移動に注意)
+			int x = embeddedImage.cols;
+			int y = embeddedImage.rows;
+			op.tx = (rand() + 0.f) / RAND_MAX * (src.cols - max(x, y));
+			op.ty = (rand() + 0.f) / RAND_MAX * (src.rows - max(x, y));
 
 			embedImage(src, dest, embeddedImage, op);
 
@@ -447,7 +447,7 @@ int main(int argc, char** argv)
 	}
 
 	// level 7 : 1~6全部入り
-	if (true) {
+	if (false) {
 		const int level = 7;
 		ostringstream filename;
 		filename << "level" << to_string(level);
@@ -477,9 +477,11 @@ int main(int argc, char** argv)
 				op.angle = 0; // 角度0
 			}
 			// 埋め込み座標ランダム
-			op.tx = (rand() + 0.f) / RAND_MAX * (src.cols - embeddedImage.cols);
-			op.ty = (rand() + 0.f) / RAND_MAX * (src.rows - embeddedImage.rows);
-			
+			int x = embeddedImage.cols;
+			int y = embeddedImage.rows;
+			op.tx = (rand() + 0.f) / RAND_MAX * (src.cols - max(x, y));
+			op.ty = (rand() + 0.f) / RAND_MAX * (src.rows - max(x, y));
+
 			if (lvl == 5) {
 				// リサイズ
 				double rate = 0.5 * pow(2.0, rand() % 3);
@@ -525,44 +527,12 @@ int main(int argc, char** argv)
 			generateImageLvInf(src, dest, embeddedImage, temp, angle, tx, ty);
 
 			stringstream outputNameSS;
-			outputNameSS << "levelInf/levelInf_" << setfill('0') << right << setw(3) <<  i;
+			outputNameSS << "levelInf/levelInf_" << setfill('0') << right << setw(3) << i;
 			cout << outputNameSS.str() << endl;
 			outputText(outputNameSS.str(), temp_names[tnum], tx, ty, temp, angle);
 			imwrite(outputNameSS.str() + ".png", dest);
 		}
 	}
-
-	//string sname = "beach";
-
-	//string tname = "ocean_beach_kinzokutanchi";
-	////string tname = "mokuzai_hakobu";
-	////string tname = "kids_chuunibyou_girl";
-	////string tname = "airgun_women_syufu";
-
-	//Mat src = imread("img/" + sname + ".png");
-	//Mat embededImage = imread("template/" + tname + ".png", IMREAD_ANYCOLOR);
-
-	//resize(embededImage, embededImage, Size(64, (embededImage.rows * 64 / embededImage.cols)));
-	//cout << "test" << embededImage.size() << endl;
-
-	//Mat dest;
-	//int tx, ty, angle;
-	//Mat temp;
-	//while (true)
-	//{
-	//	generateImageLvInf(src, dest, embededImage, temp, angle, tx, ty);
-	//	//generateImage(src, dest, embededImage, true);
-	//	//generateImage(src, dest, embededImage);
-	//	imshow("create image", dest);
-	//	//		imwrite(sname + ".ppm", dest);
-
-	//	int key = waitKey();
-	//	if (key == 'q')
-	//	{
-	//		break;
-	//	}
-	//}
-	//imwrite(tname + ".ppm", embededImage);
 
 	cout << "press any key";
 	waitKey(0);

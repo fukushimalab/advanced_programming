@@ -1,1 +1,1 @@
-ocean_beach_kinzokutanchi 444 79 64 64 270
+mokuzai_hakobu 606 56 64 64 0

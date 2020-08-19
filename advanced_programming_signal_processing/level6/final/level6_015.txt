@@ -1,1 +1,1 @@
-airgun_women_syufu 48 206 64 59 270
+airgun_women_syufu 55 323 59 64 270
