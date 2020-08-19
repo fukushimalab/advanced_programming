@@ -31,7 +31,7 @@ main関数にて，生成したいレベルのifブロックをtrueにする．
 - void addImpulseNoise(const Mat src, Mat& dest, double x)
   - 画像にインパルスノイズを付与
   - 引数xはノイズの発生確率(0<=x<=1)
-- void embedImage(const cv::Mat src, cv::Mat& dest, const cv::Mat embeddedImage, const option op)
+- void embedImage(const cv::Mat src, cv::Mat& dest, cv::Mat& embeddedImage, const option op)
   - 画像埋め込み用関数
   - srcにembeddedImageをopの数値で埋め込んでdestに出力
   - テンプレート画像にアルファチャネルがある場合は背景透過
@@ -40,7 +40,7 @@ main関数にて，生成したいレベルのifブロックをtrueにする．
 - void generateImage(const Mat src, Mat& dest, const Mat embeddedImage, option op, bool isSeamless = false)
   - オプションでシームレスクローニングを選択可の画像埋め込み関数(おそらく)
   - 使っていない
-- void generateImageLvInf(const Mat src, Mat& dest, const Mat embeddedImage,Mat& temp, int& angle,int& tx,int& ty)
+- void generateImageLvInf(const Mat src, Mat& dest, Mat embeddedImage,Mat& temp, int& angle,int& tx,int& ty)
   - レベルinf用の画像生成(おそらく)
   - エラーの修正をしていないため使用不可
   - 使っていない
