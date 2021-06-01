@@ -6,7 +6,7 @@ for image in $1/test/*.ppm; do
     name="imgproc/"$bname
     x=0    	#
     echo $name
-   convert "${image}" "${name}"  # 何もしない画像処理
+    convert "${image}" "${name}"  # 何もしない画像処理
 #   convert -blur 2x6 "${image}" "${name}"
 #   convert -median 3 "${image}" "${name}"
 #   convert -auto-level "${image}" "${name}"
@@ -17,10 +17,10 @@ for image in $1/test/*.ppm; do
 	echo `basename ${template}`
 	if [ $x = 0 ]
 	then
-	    ./matching $name "${template}" rotation 0.5 cp 
+	    ./matching $name "${template}" $rotation 0.01 cwpg 
 	    x=1
 	else
-	    ./matching $name "${template}" rotation 0.5 p 
+	    ./matching $name "${template}" $rotation 0.01 wpg
 	fi
     done
     echo ""
