@@ -11,16 +11,16 @@ for image in $1/test/*.ppm; do
 #   convert -median 3 "${image}" "${name}"
 #   convert -auto-level "${image}" "${name}"
 #   convert -equalize "${image}" "${name}"
-    rotation=0
+    rotation=90
     echo $bname:
     for template in $1/*.ppm; do
 	echo `basename ${template}`
 	if [ $x = 0 ]
 	then
-	    ./matching $name "${template}" $rotation 0.01 cwpg 
+	    ./matching $name "${template}" $rotation 0.5 cp 
 	    x=1
 	else
-	    ./matching $name "${template}" $rotation 0.01 wpg
+	    ./matching $name "${template}" $rotation 0.5 p 
 	fi
     done
     echo ""
