@@ -12,6 +12,8 @@
 CPUの詳細情報は以下等で調べてください．
 https://en.wikichip.org/wiki/WikiChip
 
+CSEを使用する場合はその旨を記述し省略可
+
 # 画像処理課題
 ## imagemagick で様々な画像処理を実行せよ．
 imagemagickを使って画像をセピアカラーに変換した．
