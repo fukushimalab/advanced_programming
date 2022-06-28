@@ -3,6 +3,17 @@
 
 [説明資料（途中で読み込みが止まるので，右クリックしてダウンロードを推奨）](./docs/advanced_programming_signal_processing.pdf)
 
+##
+CSE: ~2022春まで
+ Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
+ ベースクロック 2.10 GHz　ターボ 3.70 GHz
+ メモリ：いっぱい．
+[詳細](https://www.intel.co.jp/content/www/jp/ja/products/sku/120501/intel-xeon-platinum-8160-processor-33m-cache-2-10-ghz/specifications.html)
+
+
+
+
+
 ## memo for 来年
 
 
