@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-//#include <omp.h>
+// #include <omp.h>
 
 void templateMatchingGray(Image *src, Image *template, Point *position, double *distance)
 {
@@ -16,33 +16,53 @@ void templateMatchingGray(Image *src, Image *template, Point *position, double *
 	int min_distance = INT_MAX;
 	int ret_x = 0;
 	int ret_y = 0;
-	int x, y, i, j;
-	for (y = 0; y < (src->height - template->height); y++)
+
+	Point blackp;
+	searchBlackGray(src, &blackp);
+	int x = blackp.x;
+	int y = blackp.y;
+
 	{
-		for (x = 0; x < src->width - template->width; x++)
+		int distance = 0;
+		// SSD
+		for (int j = 0; j < template->height; j++)
 		{
-			int distance = 0;
-			//SSD
-			for (j = 0; j < template->height; j++)
+			for (int i = 0; i < template->width; i++)
 			{
-				for (i = 0; i < template->width; i++)
-				{
-					int v = (src->data[(y + j) * src->width + (x + i)] - template->data[j * template->width + i]);
-					distance += v * v;
-				}
+				int v = (src->data[(y + j) * src->width + (x + i)] - template->data[j * template->width + i]);
+				distance += v * v;
 			}
-			if (distance < min_distance)
-			{
-				min_distance = distance;
-				ret_x = x;
-				ret_y = y;
-			}
+		}
+		if (distance < min_distance)
+		{
+			min_distance = distance;
+			ret_x = x;
+			ret_y = y;
 		}
 	}
 
 	position->x = ret_x;
 	position->y = ret_y;
 	*distance = sqrt(min_distance) / (template->width * template->height);
+}
+
+void searchBlackGray(Image *src, Point *position)
+{
+	for (int y = 0; y < src->height; y++)
+	{
+		for (int x = 0; x < src->width; x++)
+		{
+			int v = src->data[y * src->width + x];
+			if (v != 0)
+			{
+				continue;
+			}
+			printf("black: %d %d\n", x, y);
+			position->x = x;
+			position->y = y;
+			return;
+		}
+	}
 }
 
 void templateMatchingColor(Image *src, Image *template, Point *position, double *distance)
@@ -56,38 +76,68 @@ void templateMatchingColor(Image *src, Image *template, Point *position, double 
 	int min_distance = INT_MAX;
 	int ret_x = 0;
 	int ret_y = 0;
-	int x, y, i, j;
-	for (y = 0; y < (src->height - template->height); y++)
-	{
-		for (x = 0; x < src->width - template->width; x++)
-		{
-			int distance = 0;
-			//SSD
-			for (j = 0; j < template->height; j++)
-			{
-				for (i = 0; i < template->width; i++)
-				{
-					int pt = 3 * ((y + j) * src->width + (x + i));
-					int pt2 = 3 * (j * template->width + i);
-					int r = (src->data[pt + 0] - template->data[pt2 + 0]);
-					int g = (src->data[pt + 1] - template->data[pt2 + 1]);
-					int b = (src->data[pt + 2] - template->data[pt2 + 2]);
 
-					distance += (r * r + g * g + b * b);
-				}
-			}
-			if (distance < min_distance)
+	Point blackp;
+	searchBlackColor(src, &blackp);
+	int x = blackp.x;
+	int y = blackp.y;
+
+	{
+		int distance = 0;
+		// SSD
+		for (int j = 0; j < template->height; j++)
+		{
+			for (int i = 0; i < template->width; i++)
 			{
-				min_distance = distance;
-				ret_x = x;
-				ret_y = y;
+				int pt = 3 * ((y + j) * src->width + (x + i));
+				int pt2 = 3 * (j * template->width + i);
+				int r = (src->data[pt + 0] - template->data[pt2 + 0]);
+				int g = (src->data[pt + 1] - template->data[pt2 + 1]);
+				int b = (src->data[pt + 2] - template->data[pt2 + 2]);
+
+				distance += (r * r + g * g + b * b);
 			}
+		}
+		if (distance < min_distance)
+		{
+			min_distance = distance;
+			ret_x = x;
+			ret_y = y;
 		}
 	}
 
 	position->x = ret_x;
 	position->y = ret_y;
 	*distance = sqrt(min_distance) / (template->width * template->height);
+}
+
+void searchBlackColor(Image *src, Point *position)
+{
+	for (int y = 0; y < src->height; y++)
+	{
+		for (int x = 0; x < src->width; x++)
+		{
+			int pt = 3 * (y * src->width + x);
+			int r = src->data[pt + 0];
+			if (r != 0)
+			{
+				continue;
+			}
+			int g = src->data[pt + 1];
+			if (g != 0)
+			{
+				continue;
+			}
+			int b = src->data[pt + 2];
+			if (b != 0)
+			{
+				continue;
+			}
+			position->x = x;
+			position->y = y;
+			return;
+		}
+	}
 }
 
 // test/beach3.ppm template /airgun_women_syufu.ppm 0 0.5 cwp
