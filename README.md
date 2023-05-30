@@ -3,20 +3,8 @@
 
 [説明資料（途中で読み込みが止まるので，右クリックしてダウンロードを推奨）](./docs/advanced_programming_signal_processing.pdf)
 
-##
-
-CSE: ~2022春まで
- Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
- ベースクロック 2.10 GHz　ターボ 3.70 GHz
- メモリ：いっぱい．
-[詳細](https://www.intel.co.jp/content/www/jp/ja/products/sku/120501/intel-xeon-platinum-8160-processor-33m-cache-2-10-ghz/specifications.html)
-
-
-
-
-
-## memo for 来年
-
+## Todo for 2024
+- [] finalをたくさん作ってどこかを選ぶ形に変更．
 
 ## 達成目標
 ある目的を達成するには，すべての機能を一つの言語だけでプログラムする必要はない．
@@ -26,7 +14,6 @@ CSE: ~2022春まで
 * c言語プログラム
 * ImageMagick
 * シェルスクリプト
-
 
 C言語プログラムでは，テンプレートマッチング自体が実装してある．
 ImageMagickは簡単な画像処理を行う，コマンドラインベースのプログラムである．
@@ -82,3 +69,10 @@ sh answer.sh result level1
 # 備考
 エラーが閾値以下の場合に，ファイルを書き込む仕様である．
 つまり，閾値以下のものが2つ以上あった場合，どちらを正解とするかを判断する機構がないため，2つ以上の閾値以下の値を見つけた場合は，エラーになる可能性がある．
+
+
+CSE: ~2022春まで
+ Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
+ ベースクロック 2.10 GHz　ターボ 3.70 GHz
+ メモリ：いっぱい．
+[詳細](https://www.intel.co.jp/content/www/jp/ja/products/sku/120501/intel-xeon-platinum-8160-processor-33m-cache-2-10-ghz/specifications.html)
