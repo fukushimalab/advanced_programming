@@ -4,6 +4,7 @@
 [説明資料（途中で読み込みが止まるので，右クリックしてダウンロードを推奨）](./docs/advanced_programming_signal_processing.pdf)
 
 ##
+
 CSE: ~2022春まで
  Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
  ベースクロック 2.10 GHz　ターボ 3.70 GHz
@@ -43,14 +44,19 @@ cd advanced_programming_signal_processing
 ```shell
 make
 ```
+
 3. level1のテンプレートマッチングを実行（1~7は演習次第でかえる）
 ```shell
 time sh run.sh level1
 ```
+
 4. 結果をチェック
 ```shell
 sh answer.sh result level1
 ```
+
+引数は2つでresultを忘れがちなので注意．
+
 5. ファイルの編集
 * Makefileを編集コンパイルオプションの変更
 * run.shを編集して，ImageMagickやmatchingの引数を変更
