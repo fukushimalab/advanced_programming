@@ -5,139 +5,96 @@
 #include <limits.h>
 // #include <omp.h>
 
-void templateMatchingGray(Image *src, Image *template, Point *position, double *distance)
+void templateMatchingGray(Image *src, Image *templ, Point *position, double *distance)
 {
-	if (src->channel != 1 || template->channel != 1)
+	if (src->channel != 1 || templ->channel != 1)
 	{
 		fprintf(stderr, "src and/or templeta image is not a gray image.\n");
 		return;
 	}
 
-	int min_distance = INT_MAX;
-	int ret_x = 0;
-	int ret_y = 0;
-
-	Point blackp;
-	searchBlackGray(src, &blackp);
-	int x = blackp.x;
-	int y = blackp.y;
-
+	for (int y = 0; y < src->height - templ->height; y++)
 	{
-		int distance = 0;
-		// SSD
-		for (int j = 0; j < template->height; j++)
+		for (int x = 0; x < src->height - templ->height; x++)
 		{
-			for (int i = 0; i < template->width; i++)
+			if (isMatchGray(src, templ, x, y))
 			{
-				int v = (src->data[(y + j) * src->width + (x + i)] - template->data[j * template->width + i]);
-				distance += v * v;
+				position->x = x;
+				position->y = y;
+				*distance = 0;
+				return;
 			}
-		}
-		if (distance < min_distance)
-		{
-			min_distance = distance;
-			ret_x = x;
-			ret_y = y;
 		}
 	}
 
-	position->x = ret_x;
-	position->y = ret_y;
-	*distance = sqrt(min_distance) / (template->width * template->height);
+	position->x = 0;
+	position->y = 0;
+	*distance = INT_MAX;
+	return;
 }
 
-void searchBlackGray(Image *src, Point *position)
+int isMatchGray(Image *src, Image *templ, int x, int y)
 {
-	for (int y = 0; y < src->height; y++)
+	for (int j = 0; j < templ->height; j++)
 	{
-		for (int x = 0; x < src->width; x++)
+		for (int i = 0; i < templ->width; i++)
 		{
-			int v = src->data[y * src->width + x];
-			if (v != 0)
+			int pt = (y + j) * src->width + (x + i);
+			int pt2 = j * templ->width + i;
+			if (src->data[pt] != templ->data[pt2])
 			{
-				continue;
+				return 0;
 			}
-			printf("black: %d %d\n", x, y);
-			position->x = x;
-			position->y = y;
-			return;
 		}
 	}
+	return 1;
 }
 
-void templateMatchingColor(Image *src, Image *template, Point *position, double *distance)
+void templateMatchingColor(Image *src, Image *templ, Point *position, double *distance)
 {
-	if (src->channel != 3 || template->channel != 3)
+	if (src->channel != 3 || templ->channel != 3)
 	{
-		fprintf(stderr, "src and/or templeta image is not a color image.\n");
+		fprintf(stderr, "src and/or template image is not a color image.\n");
 		return;
 	}
 
-	int min_distance = INT_MAX;
-	int ret_x = 0;
-	int ret_y = 0;
-
-	Point blackp;
-	searchBlackColor(src, &blackp);
-	int x = blackp.x;
-	int y = blackp.y;
-
+	for (int y = 0; y < src->height - templ->height; y++)
 	{
-		int distance = 0;
-		// SSD
-		for (int j = 0; j < template->height; j++)
+		for (int x = 0; x < src->width - templ->width; x++)
 		{
-			for (int i = 0; i < template->width; i++)
+			if (isMatchColor(src, templ, x, y))
 			{
-				int pt = 3 * ((y + j) * src->width + (x + i));
-				int pt2 = 3 * (j * template->width + i);
-				int r = (src->data[pt + 0] - template->data[pt2 + 0]);
-				int g = (src->data[pt + 1] - template->data[pt2 + 1]);
-				int b = (src->data[pt + 2] - template->data[pt2 + 2]);
-
-				distance += (r * r + g * g + b * b);
+				position->x = x;
+				position->y = y;
+				*distance = 0;
+				return;
 			}
-		}
-		if (distance < min_distance)
-		{
-			min_distance = distance;
-			ret_x = x;
-			ret_y = y;
 		}
 	}
 
-	position->x = ret_x;
-	position->y = ret_y;
-	*distance = sqrt(min_distance) / (template->width * template->height);
+	position->x = 0;
+	position->y = 0;
+	*distance = INT_MAX;
+	return;
 }
 
-void searchBlackColor(Image *src, Point *position)
+int isMatchColor(Image *src, Image *templ, int x, int y)
 {
-	for (int y = 0; y < src->height; y++)
+	for (int j = 0; j < templ->height; j++)
 	{
-		for (int x = 0; x < src->width; x++)
+		for (int i = 0; i < templ->width; i++)
 		{
-			int pt = 3 * (y * src->width + x);
-			int r = src->data[pt + 0];
-			if (r != 0)
+			int pt = 3 * ((y + j) * src->width + (x + i));
+			int pt2 = 3 * (j * templ->width + i);
+			if (src->data[pt + 0] != templ->data[pt2 + 0] ||
+				src->data[pt + 1] != templ->data[pt2 + 1] ||
+				src->data[pt + 2] != templ->data[pt2 + 2])
 			{
-				continue;
+				return 0;
 			}
-			int g = src->data[pt + 1];
-			if (g != 0)
-			{
-				continue;
-			}
-			int b = src->data[pt + 2];
-			if (b != 0)
-			{
-				continue;
-			}
-			position->x = x;
-			position->y = y;
-			return;
 		}
 	}
+	return 1;
 }
 
 // test/beach3.ppm template /airgun_women_syufu.ppm 0 0.5 cwp

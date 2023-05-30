@@ -20,17 +20,17 @@ process_image() {
 	echo `basename ${template}`
 	if [ $x = 0 ]
 	then
-	    ./matching_${level} $name "${template}" $rotation 0.5 cp  # call the matching program corresponding to the level
+	    ./matching_${level} $name "${template}" $rotation 0.5 cwp  # call the matching program corresponding to the level
 	    x=1
 	else
-	    ./matching_${level} $name "${template}" $rotation 0.5 p  # call the matching program corresponding to the level
+	    ./matching_${level} $name "${template}" $rotation 0.5 wp  # call the matching program corresponding to the level
 	fi
     done
     echo ""
 }
 
 level=$1  # receive the level from the command line
-for image in ${level}/test/*.ppm; do
+for image in ${level}/final/*.ppm; do
     process_image $image $level $level &
 done
 
