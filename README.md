@@ -70,6 +70,10 @@ sh answer.sh result level1
 エラーが閾値以下の場合に，ファイルを書き込む仕様である．
 つまり，閾値以下のものが2つ以上あった場合，どちらを正解とするかを判断する機構がないため，2つ以上の閾値以下の値を見つけた場合は，エラーになる可能性がある．
 
+# CSEの情報（2023年～）：
+* 各自端末 [Intel Core-i5 11500T](https://www.intel.co.jp/content/www/jp/ja/products/sku/212272/intel-core-i511500t-processor-12m-cache-up-to-3-90-ghz/specifications.html)（1.5GHz，6コア，12スレッド）2号館
+* 各自端末 [Intel Core-i5 11500](https://www.intel.co.jp/content/www/jp/ja/products/sku/212277/intel-core-i511500-processor-12m-cache-up-to-4-60-ghz/specifications.html)（2.7GHz，6コア，12スレッド）20号館
+* サーバー [AMD EPYC 7763](https://www.amd.com/ja/products/cpu/amd-epyc-7763) 64コア128スレッドx2
 
 CSE: ~2022春まで
  Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
