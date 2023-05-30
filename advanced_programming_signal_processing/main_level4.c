@@ -87,15 +87,12 @@ void templateMatchingColor(Image *src, Image *templ, Point *position, double *di
 int calculateSSDColor(Image *src, Image *templ, int x, int y)
 {
     int distance = 0;
-    int THRESHOLD = 537500;
+    int THRESHOLD = templ->width * templ->height * 180;
 
     for (int j = 0; j < templ->height; j++)
     {
         for (int i = 0; i < templ->width; i++)
         {
-            i = (i + templ->width / 3) % templ->width;
-            j = (j + templ->height / 3) % templ->height;
-
             int pt = 3 * ((y + j) * src->width + (x + i));
             int pt2 = 3 * (j * templ->width + i);
 
