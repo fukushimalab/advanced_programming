@@ -1,4 +1,5 @@
-#include "imageUtil.h"
+#include "imageUtil.cuh"
+#include <cuda.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,8 +88,8 @@ int isMatchColor(Image *src, Image *templ, int x, int y)
 			int pt = 3 * ((y + j) * src->width + (x + i));
 			int pt2 = 3 * (j * templ->width + i);
 			if (src->data[pt + 0] != templ->data[pt2 + 0] ||
-				src->data[pt + 1] != templ->data[pt2 + 1] ||
-				src->data[pt + 2] != templ->data[pt2 + 2])
+					src->data[pt + 1] != templ->data[pt2 + 1] ||
+					src->data[pt + 2] != templ->data[pt2 + 2])
 			{
 				return 0;
 			}
@@ -116,7 +117,7 @@ int main(int argc, char **argv)
 	}
 
 	char *input_file = argv[1];
-	char *template_file = argv[2];
+	char *templ_file = argv[2];
 	int rotation = atoi(argv[3]);
 	double threshold = atof(argv[4]);
 
@@ -138,18 +139,18 @@ int main(int argc, char **argv)
 	if (argc == 6)
 	{
 		char *p = NULL;
-		if (p = strchr(argv[5], 'c') != NULL)
+		if ((p = strchr(argv[5], 'c')) != NULL)
 			clearResult(output_name_txt);
-		if (p = strchr(argv[5], 'w') != NULL)
+		if ((p = strchr(argv[5], 'w')) != NULL)
 			isWriteImageResult = 1;
-		if (p = strchr(argv[5], 'p') != NULL)
+		if ((p = strchr(argv[5], 'p')) != NULL)
 			isPrintResult = 1;
-		if (p = strchr(argv[5], 'g') != NULL)
+		if ((p = strchr(argv[5], 'g')) != NULL)
 			isGray = 1;
 	}
 
 	Image *img = readPXM(input_file);
-	Image *template = readPXM(template_file);
+	Image *templ = readPXM(templ_file);
 
 	Point result;
 	double distance = 0.0;
@@ -157,30 +158,27 @@ int main(int argc, char **argv)
 	if (isGray && img->channel == 3)
 	{
 		Image *img_gray = createImage(img->width, img->height, 1);
-		Image *template_gray = createImage(template->width, template->height, 1);
+		Image *templ_gray = createImage(templ->width, templ->height, 1);
 		cvtColorGray(img, img_gray);
-		cvtColorGray(template, template_gray);
+		cvtColorGray(templ, templ_gray);
 
-		templateMatchingGray(img_gray, template_gray, &result, &distance);
-
-		freeImage(img_gray);
-		freeImage(template_gray);
+		templateMatchingGray(img_gray, templ_gray, &result, &distance);
 	}
 	else
 	{
-		templateMatchingColor(img, template, &result, &distance);
+		templateMatchingColor(img, templ, &result, &distance);
 	}
 
 	if (distance < threshold)
 	{
-		writeResult(output_name_txt, getBaseName(template_file), result, template->width, template->height, rotation, distance);
+		writeResult(output_name_txt, getBaseName(templ_file), result, templ->width, templ->height, rotation, distance);
 		if (isPrintResult)
 		{
-			printf("[Found    ] %s %d %d %d %d %d %f\n", getBaseName(template_file), result.x, result.y, template->width, template->height, rotation, distance);
+			printf("[Found    ] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
 		}
 		if (isWriteImageResult)
 		{
-			drawRectangle(img, result, template->width, template->height);
+			drawRectangle(img, result, templ->width, templ->height);
 
 			if (img->channel == 3)
 				strcat(output_name_img, ".ppm");
@@ -194,12 +192,12 @@ int main(int argc, char **argv)
 	{
 		if (isPrintResult)
 		{
-			printf("[Not found] %s %d %d %d %d %d %f\n", getBaseName(template_file), result.x, result.y, template->width, template->height, rotation, distance);
+			printf("[Not found] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
 		}
 	}
 
 	freeImage(img);
-	freeImage(template);
+	freeImage(templ);
 
 	return 0;
 }
