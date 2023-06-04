@@ -12,7 +12,14 @@ typedef struct Point
 {
 	int x;
 	int y;
-}Point;
+} Point;
+
+typedef struct Pixel
+{
+	int r;
+	int g;
+	int b;
+} Pixel;
 
 void printImageInfo(Image* src);
 void freeImage(Image* img);
