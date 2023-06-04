@@ -185,27 +185,23 @@ char *getDirAndBaseName(const char *name)
 
 char *getBaseName(const char *name)
 {
-	int len = (int)strlen(name);
-	char *ret = (char *)malloc(len);
-	memcpy(ret, name, len);
-	int count = 0;
-	int i;
-	for (i = 0; i < len; i++)
+	int len = strlen(name);
+	char *ret = (char *)malloc(len + 1); // Allocate extra byte for null character
+	strcpy(ret, name);									 // Use strcpy to include null character
+
+	char *lastSlash = strrchr(ret, '/'); // Find the last occurrence of '/'
+	if (lastSlash != NULL)
 	{
-		if (ret[i] == '/')
-			count++;
+		ret = lastSlash + 1;
 	}
 
-	for (i = 0; i < count; i++)
+	char *ppt = strchr(ret, '.');
+	if (ppt != NULL)
 	{
-		ret = strchr(ret, '/');
-	}
-
-	char *ppt;
-	if ((ppt = strchr(ret, '.')) != NULL)
 		*ppt = '\0';
+	}
 
-	return ret + 1;
+	return ret;
 }
 
 void writeResult(const char *file_name, const char *template_name, const Point result, const int width, const int height, const int rotation, const double distance)
