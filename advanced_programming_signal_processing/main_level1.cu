@@ -101,6 +101,9 @@ int isMatchColor(Image *src, Image *templ, int x, int y)
 // test/beach3.ppm template /airgun_women_syufu.ppm 0 0.5 cwp
 int main(int argc, char **argv)
 {
+	CalcTime t;
+	// 初期化
+	t.start();
 	if (argc < 5)
 	{
 		fprintf(stderr, "Usage: templateMatching src_image temlate_image rotation threshold option(c,w,p,g)\n");
@@ -121,7 +124,7 @@ int main(int argc, char **argv)
 	int rotation = atoi(argv[3]);
 	double threshold = atof(argv[4]);
 
-	printf("rotation -> %d\n", rotation);
+	// printf("rotation -> %d\n", rotation);
 
 	char output_name_base[256];
 	char output_name_txt[256];
@@ -154,7 +157,14 @@ int main(int argc, char **argv)
 
 	Point result;
 	double distance = 0.0;
+	// 初期化終了
+	t.end();
+	printf("画像：%s\n", input_file);
+	printf("テンプレートファイル：%s\n", templ_file);
+	printf("初期化. %5.2lf[ms]\n", t.getAvgTime(false));
 
+	// テンプレートマッチング開始
+	t.start();
 	if (isGray && img->channel == 3)
 	{
 		Image *img_gray = createImage(img->width, img->height, 1);
@@ -168,13 +178,18 @@ int main(int argc, char **argv)
 	{
 		templateMatchingColor(img, templ, &result, &distance);
 	}
+	// テンプレートマッチング終了
+	t.end();
+	printf("メイン. %5.2lf[ms]\n", t.getAvgTime(false));
 
+	// 後処理開始
+	t.start();
 	if (distance < threshold)
 	{
 		writeResult(output_name_txt, getBaseName(templ_file), result, templ->width, templ->height, rotation, distance);
 		if (isPrintResult)
 		{
-			printf("[Found    ] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
+			// printf("[Found    ] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
 		}
 		if (isWriteImageResult)
 		{
@@ -184,7 +199,7 @@ int main(int argc, char **argv)
 				strcat(output_name_img, ".ppm");
 			else if (img->channel == 1)
 				strcat(output_name_img, ".pgm");
-			printf("out: %s", output_name_img);
+			// printf("out: %s", output_name_img);
 			writePXM(output_name_img, img);
 		}
 	}
@@ -192,12 +207,18 @@ int main(int argc, char **argv)
 	{
 		if (isPrintResult)
 		{
-			printf("[Not found] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
+			// printf("[Not found] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
 		}
 	}
 
 	freeImage(img);
 	freeImage(templ);
+
+	// 後処理終了
+	t.end();
+	printf("後処理. %5.2lf[ms]\n", t.getAvgTime(false));
+
+	printf("\n");
 
 	return 0;
 }

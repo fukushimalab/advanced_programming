@@ -7,17 +7,17 @@ process_image() {
     level=$2
     bname=`basename ${image}`
     name="imgproc/"$bname
-    x=0    	#
-    echo $name
-    convert "${image}" "${name}"  # 何もしない画像処理
-#   convert -blur 2x6 "${image}" "${name}"
-#   convert -median 3 "${image}" "${name}"
-#   convert -auto-level "${image}" "${name}"
-#   convert -equalize "${image}" "${name}"
+    x=0
+    # echo $name
+    # convert "${image}" "${name}"  # 何もしない画像処理
+    # convert -blur 2x6 "${image}" "${name}"
+    # convert -median 3 "${image}" "${name}"
+    # convert -auto-level "${image}" "${name}"
+    # convert -equalize "${image}" "${name}"
     rotation=0
-    echo $bname:
+    # echo $bname:
     for template in $3/*.ppm; do
-	echo `basename ${template}`
+	# echo `basename ${template}`
 	if [ $x = 0 ]
 	then
 	    ./matching_${level} $name "${template}" $rotation 0.5 cwp  # call the matching program corresponding to the level
@@ -26,7 +26,9 @@ process_image() {
 	    ./matching_${level} $name "${template}" $rotation 0.5 wp  # call the matching program corresponding to the level
 	fi
     done
-    echo ""
+    # ? シェルスクリプト表示が連続で表示されるためコメントアウト
+    # ? CUDAに変えたせいで、この行だけ並列処理されている？
+    # echo ""
 }
 
 level=$1  # receive the level from the command line
