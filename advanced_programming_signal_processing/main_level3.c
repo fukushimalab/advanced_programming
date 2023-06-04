@@ -103,9 +103,9 @@ int isMatchColor(Image *src, Image *templ, int x, int y, double alpha)
 
             changeAlpha(&templ_px, alpha);
 
-            if (abs(src_r - templ_px.r) > 32 ||
-                abs(src_g - templ_px.g) > 32 ||
-                abs(src_b - templ_px.b) > 32)
+            if (abs(src_r - templ_px.r) > 1 ||
+                abs(src_g - templ_px.g) > 1 ||
+                abs(src_b - templ_px.b) > 1)
             {
                 return 0;
             }
