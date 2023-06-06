@@ -73,7 +73,9 @@ sh answer.sh result level1
 # CSEの情報（2023年～）：
 * 各自端末 [Intel Core-i5 11500T](https://www.intel.co.jp/content/www/jp/ja/products/sku/212272/intel-core-i511500t-processor-12m-cache-up-to-3-90-ghz/specifications.html)（1.5GHz，6コア，12スレッド）2号館
 * 各自端末 [Intel Core-i5 11500](https://www.intel.co.jp/content/www/jp/ja/products/sku/212277/intel-core-i511500-processor-12m-cache-up-to-4-60-ghz/specifications.html)（2.7GHz，6コア，12スレッド）20号館
-* サーバー [AMD EPYC 7763](https://www.amd.com/ja/products/cpu/amd-epyc-7763) 64コア128スレッドx2
+* サーバー 
+	* CPU [AMD EPYC 7763](https://www.amd.com/ja/products/cpu/amd-epyc-7763) 14.3 TFLOPS (128コアｘ2(FMA)x8(SIMD)x2(unit)x3.5GHz)
+	* GPU [A100x3]（https://www.nvidia.com/ja-jp/data-center/a100/）19.5x3 TFLOPS(6,912コアｘ2(FMA)x1.41GHz)
 
 CSE: ~2022春まで
  Xeon® Platinum 8160 24/48 x8ソケット 192 core /384 thread
