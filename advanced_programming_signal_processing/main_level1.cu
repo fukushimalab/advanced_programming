@@ -5,22 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <unistd.h>
 #include <glob.h>
-// #include <omp.h>
 
-void templateMatchingGray(Image *src, Image *templ, Point *position, double *distance)
+__global__ void kernelGray(Image src, Image templ, Point *position, double *distance)
 {
-	if (src->channel != 1 || templ->channel != 1)
-	{
-		fprintf(stderr, "src and/or templeta image is not a gray image.\n");
-		return;
-	}
 
-	for (int y = 0; y < src->height - templ->height; y++)
+	for (int y = 0; y < src.height - templ.height; y++)
 	{
-		for (int x = 0; x < src->height - templ->height; x++)
+		for (int x = 0; x < src.height - templ.height; x++)
 		{
-			if (isMatchGray(src, templ, x, y))
+			if (isMatchGray(&src, &templ, x, y))
 			{
 				position->x = x;
 				position->y = y;
@@ -36,7 +31,63 @@ void templateMatchingGray(Image *src, Image *templ, Point *position, double *dis
 	return;
 }
 
-int isMatchGray(Image *src, Image *templ, int x, int y)
+void templateMatchingGray(Image *src, Image *templ, Point *position, double *distance)
+{
+	Image d_img;
+	d_img.channel = src->channel;
+	d_img.height = src->height;
+	d_img.width = src->width;
+	size_t size = src->height * src->width * src->channel * sizeof(unsigned char);
+	cudaMalloc((void **)&d_img.data, size);
+	cudaMemcpy(d_img.data, src->data, size, cudaMemcpyHostToDevice);
+
+	Image d_templ;
+	d_templ.channel = templ->channel;
+	d_templ.height = templ->height;
+	d_templ.width = templ->width;
+	size = templ->width * templ->height * templ->channel * sizeof(unsigned char);
+	cudaMalloc((void **)&d_templ.data, size);
+	cudaMemcpy(d_templ.data, templ->data, size, cudaMemcpyHostToDevice);
+
+	Point *d_position;
+	cudaMalloc((void **)&d_position, sizeof(Point));
+
+	d_position->x = position->x;
+	d_position->y = position->y;
+
+	double *d_distance;
+	cudaMalloc((void **)d_distance, sizeof(double));
+
+	if (src->channel != 1 || templ->channel != 1)
+	{
+		// デバイス関数では printf は可能だが fprintf は不可能
+		printf("src and/or templete image is not a gray image.\n");
+		return;
+	}
+	kernelGray<<<1, 1>>>(d_img, d_templ, d_position, d_distance);
+
+	cudaDeviceSynchronize();
+
+	cudaError_t error = cudaGetLastError();
+	if (error != cudaSuccess)
+	{
+		fprintf(stderr, "%s: %s\n", __func__, cudaGetErrorString(error));
+	}
+
+	// GPUメモリをCPUメモリにコピー
+	cudaMemcpy(distance, &d_distance, sizeof(double), cudaMemcpyDeviceToHost);
+
+	printf("%s distance: %lf\n", __func__, distance);
+
+	// GPUメモリの解放
+	cudaFree(d_img.data);
+	cudaFree(d_templ.data);
+	cudaFree(d_position);
+	cudaFree(d_distance);
+	return;
+}
+
+__device__ int isMatchGray(Image *src, Image *templ, int x, int y)
 {
 	for (int j = 0; j < templ->height; j++)
 	{
@@ -53,19 +104,14 @@ int isMatchGray(Image *src, Image *templ, int x, int y)
 	return 1;
 }
 
-void templateMatchingColor(Image *src, Image *templ, Point *position, double *distance)
+__global__ void kernelColor(Image src, Image templ, Point *position, double *distance)
 {
-	if (src->channel != 3 || templ->channel != 3)
-	{
-		fprintf(stderr, "src and/or template image is not a color image.\n");
-		return;
-	}
 
-	for (int y = 0; y < src->height - templ->height; y++)
+	for (int y = 0; y < src.height - templ.height; y++)
 	{
-		for (int x = 0; x < src->width - templ->width; x++)
+		for (int x = 0; x < src.height - templ.height; x++)
 		{
-			if (isMatchColor(src, templ, x, y))
+			if (isMatchColor(&src, &templ, x, y))
 			{
 				position->x = x;
 				position->y = y;
@@ -81,7 +127,59 @@ void templateMatchingColor(Image *src, Image *templ, Point *position, double *di
 	return;
 }
 
-int isMatchColor(Image *src, Image *templ, int x, int y)
+void templateMatchingColor(Image *src, Image *templ, Point *position, double *distance)
+{
+	Image d_img;
+	d_img.channel = src->channel;
+	d_img.height = src->height;
+	d_img.width = src->width;
+	size_t size = src->height * src->width * src->channel * sizeof(unsigned char);
+	cudaMalloc((void **)&d_img.data, size);
+	cudaMemcpy(d_img.data, src->data, size, cudaMemcpyHostToDevice);
+
+	Image d_templ;
+	d_templ.channel = templ->channel;
+	d_templ.height = templ->height;
+	d_templ.width = templ->width;
+	size = templ->width * templ->height * templ->channel * sizeof(unsigned char);
+	cudaMalloc((void **)&d_templ.data, size);
+	cudaMemcpy(d_templ.data, templ->data, size, cudaMemcpyHostToDevice);
+
+	Point *d_position;
+	cudaMalloc((void **)&d_position, sizeof(Point));
+
+	double *d_distance;
+	cudaMalloc((void **)&d_distance, sizeof(double));
+
+	if (src->channel != 3 || templ->channel != 3)
+	{
+		// デバイス関数では printf は可能だが fprintf は不可能
+		printf("src and/or template image is not a color image.\n");
+		return;
+	}
+	kernelColor<<<1, 1>>>(d_img, d_templ, d_position, d_distance);
+
+	// cudaDeviceSynchronize();
+
+	cudaError_t error = cudaGetLastError();
+	if (error != cudaSuccess)
+	{
+		fprintf(stderr, "%s: %s\n", __func__, cudaGetErrorString(error));
+	}
+	// GPUメモリをCPUメモリにコピー
+	cudaMemcpy(distance, &d_distance, sizeof(double), cudaMemcpyDeviceToHost);
+
+	printf("%s distance: %lf\n", __func__, distance);
+
+	// GPUメモリの解放
+	cudaFree(d_img.data);
+	cudaFree(d_templ.data);
+	cudaFree(d_position);
+	cudaFree(d_distance);
+	return;
+}
+
+__device__ int isMatchColor(Image *src, Image *templ, int x, int y)
 {
 	for (int j = 0; j < templ->height; j++)
 	{
@@ -146,6 +244,10 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 
 	// テンプレートマッチング開始
 	t.start();
+
+	// cudaMalloc((void **)&d_img, sizeof(Image));
+	// cudaMalloc((void **)&d_templ, sizeof(Image));
+
 	if (isGray && img->channel == 3)
 	{
 		Image *img_gray = createImage(img->width, img->height, 1);
@@ -153,11 +255,69 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 		cvtColorGray(img, img_gray);
 		cvtColorGray(templ, templ_gray);
 
-		templateMatchingGray(img_gray, templ_gray, &result, &distance);
+		// // 画像サイズの取得
+		// size_t size_img = img_gray->width * img_gray->height * img_gray->channel;
+		// size_t size_templ = templ_gray->width * templ_gray->height * templ_gray->channel;
+
+		// // 画像データのメモリ領域確保
+		// cudaMalloc((void **)&d_img->data, size_img);
+		// cudaMalloc((void **)&d_templ->data, size_templ);
+
+		// // 画像をGPUにコピー
+		// cudaMemcpy(d_img->data, img_gray->data, size_img, cudaMemcpyHostToDevice);
+		// cudaMemcpy(d_templ->data, img_gray->data, size_templ, cudaMemcpyHostToDevice);
+
+		// // 構造体をGPUにコピー
+		// cudaMemcpy(d_img, img_gray, sizeof(Image), cudaMemcpyHostToDevice);
+		// cudaMemcpy(d_templ, templ_gray, sizeof(Image), cudaMemcpyHostToDevice);
+
+		// テンプレートマッチング
+		templateMatchingGray(img, templ, &result, &distance);
+
+		freeImage(img_gray);
+		freeImage(templ_gray);
 	}
 	else
 	{
+
+		// // 画像サイズの取得
+		// size_t size_img = img->width * img->height * img->channel * sizeof(unsigned char);
+		// size_t size_templ = templ->width * templ->height * templ->channel * sizeof(unsigned char);
+
+		// printf("hoge1\n");
+		// // 画像データのメモリ領域確保
+		// cudaMalloc((void **)&d_img->data, size_img);
+		// cudaMalloc((void **)&d_templ->data, size_templ);
+
+		// printf("hoge2\n");
+		// // 画像をGPUにコピー
+		// cudaMemcpy(d_img->data, img->data, size_img, cudaMemcpyHostToDevice);
+		// cudaMemcpy(d_templ->data, templ->data, size_templ, cudaMemcpyHostToDevice);
+
+		// printf("hoge3\n");
+		// // 構造体をGPUにコピー
+		// cudaMemcpy(d_img, img, sizeof(Image), cudaMemcpyHostToDevice);
+		// cudaMemcpy(d_templ, templ, sizeof(Image), cudaMemcpyHostToDevice);
+
+		// printf("hoge4\n");
+		// テンプレートマッチング
 		templateMatchingColor(img, templ, &result, &distance);
+		printf("%s distance: %lf\n", __func__, distance);
+
+		// printf("hoge5\n");
+		// cudaDeviceSynchronize();
+
+		// cudaError_t error = cudaGetLastError();
+		// if (error != cudaSuccess)
+		// {
+		// 	fprintf(stderr, "Error: %s\n", cudaGetErrorString(error));
+		// }
+
+		// cudaMemcpy(img, d_img, sizeof(Image), cudaMemcpyDeviceToHost);
+		// cudaMemcpy(templ, d_templ, sizeof(Image), cudaMemcpyDeviceToHost);
+
+		// cudaFree(d_img);
+		// cudaFree(d_templ);
 	}
 	// テンプレートマッチング終了
 	t.end();
@@ -167,14 +327,20 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 	t.start();
 	if (distance < threshold)
 	{
+		printf("hoge1\n");
 		writeResult(output_name_txt, getBaseName(templ_file), result, templ->width, templ->height, rotation, distance);
+		printf("hoge2\n");
 		if (isPrintResult)
 		{
 			// printf("[Found    ] %s %d %d %d %d %d %f\n", getBaseName(templ_file), result.x, result.y, templ->width, templ->height, rotation, distance);
 		}
 		if (isWriteImageResult)
 		{
+			printf("hoge3\n");
+			printf("result x: %d\n", result.x);
+			printf("result y: %d\n", result.y);
 			drawRectangle(img, result, templ->width, templ->height);
+			printf("hoge4\n");
 
 			if (img->channel == 3)
 				strcat(output_name_img, ".ppm");
@@ -240,13 +406,15 @@ void process_image(char *image, char *level)
 
 int main(int argc, char *argv[])
 {
+	char pathname[256];
+	getcwd(pathname, 256);
+	printf("pathname: %s\n", pathname);
 	char *level = argv[1];
 	glob_t glob_result;
 
 	char input_path[256];
 	strcpy(input_path, level);
 	strcat(input_path, "/final/*.ppm");
-	printf("test file path: %s\n", input_path);
 
 	glob(input_path, GLOB_TILDE, NULL, &glob_result);
 	for (unsigned int i = 0; i < glob_result.gl_pathc; ++i)

@@ -16,5 +16,9 @@ matching_level1: main_level1.cu imageUtil.cu
 level2: main_level2.c imageUtil.c
 	gcc -w -O3 -o matching_level2 main_level2.c imageUtil.c -lm -mtune=native
 
+debug: main_level1.cu imageUtil.cu
+	nvcc -w -O3 -g -G -o matching_level1 main_level1.cu imageUtil.cu -lm
+
+
 clean:
 	$(RM) matching
