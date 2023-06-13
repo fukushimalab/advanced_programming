@@ -7,7 +7,7 @@ level1: matching_level1
 		name="imgproc/"$${bname}; \
 		convert $${image} $${name}; \
 	done
-	@time (./matching_level1 level1 > result.txt) 2>> result.txt
+	@time (./matching_level1 > result.txt) 2>> result.txt
 	@./answer_final.sh result level1
 
 matching_level1: main_level1.cu imageUtil.cu

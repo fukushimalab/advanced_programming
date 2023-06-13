@@ -300,10 +300,12 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 	return 0;
 }
 
-void process_image(char *image, char *level)
+void process_image(char *image)
 {
+	char *level = "level1";
 	char *bname = getBaseName(image);
 	strcat(bname, ".ppm");
+	// 例：name = imgproc/level1_000.ppm, imgproc/level1_001.ppm
 	char *name = (char *)malloc(256);
 	strcpy(name, "imgproc/");
 	strcat(name, bname);
@@ -314,6 +316,7 @@ void process_image(char *image, char *level)
 	char *search_path = (char *)malloc(256);
 	strcpy(search_path, level);
 	strcat(search_path, "/*.ppm");
+	// level1/*.ppm （テンプレート画像）で正規表現マッチング
 	glob(search_path, GLOB_TILDE, NULL, &glob_result);
 
 	int x = 0;
@@ -322,11 +325,13 @@ void process_image(char *image, char *level)
 		char *templ = glob_result.gl_pathv[i];
 		if (x == 0)
 		{
+			// 問題の画像とテンプレート画像でテンプレートマッチング
 			level1(name, templ, rotation, 0.5, "cwp");
 			x = 1;
 		}
 		else
 		{
+			// 問題の画像とテンプレート画像でテンプレートマッチング
 			level1(name, templ, rotation, 0.5, "wp");
 		}
 	}
@@ -335,18 +340,19 @@ void process_image(char *image, char *level)
 
 int main(int argc, char *argv[])
 {
-	char *level = argv[1];
+	// 問題の画像のパスの正規表現
 	glob_t glob_result;
 
+	// level1/final/*.ppm にある画像の取得
 	char input_path[256];
-	strcpy(input_path, level);
-	strcat(input_path, "/final/*.ppm");
+	strcat(input_path, "level1/final/*.ppm");
 
+	// level1/final/*.ppm でマッチング
 	glob(input_path, GLOB_TILDE, NULL, &glob_result);
 	for (unsigned int i = 0; i < glob_result.gl_pathc; ++i)
 	{
 		char *image = glob_result.gl_pathv[i];
-		process_image(image, level);
+		process_image(image);
 	}
 	globfree(&glob_result);
 	return 0;
