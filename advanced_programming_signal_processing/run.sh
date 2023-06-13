@@ -9,21 +9,64 @@ process_image() {
     name="imgproc/"$bname
     x=0    	#
     echo $name
-    convert "${image}" "${name}"  # 何もしない画像処理
-#   convert -blur 2x6 "${image}" "${name}"
-#   convert -median 3 "${image}" "${name}"
-#   convert -auto-level "${image}" "${name}"
-#   convert -equalize "${image}" "${name}"
+
+    case $level in
+    "level1")
+        echo "Processing level1"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level2")
+        echo "Processing level2"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level3")
+        echo "Processing level3"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level4")
+        echo "Processing level4"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level5")
+        echo "Processing level5"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level6")
+        echo "Processing level6"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level7")
+        echo "Processing level7"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    "level8")
+        echo "Processing level8"
+        convert "${image}" "${name}"
+        threshold=0.5
+        ;;
+    *)
+        echo "Unknown level: $level"
+        exit 1
+        ;;
+    esac
     rotation=0
+
     echo $bname:
     for template in $3/*.ppm; do
 	echo `basename ${template}`
 	if [ $x = 0 ]
 	then
-	    ./matching_${level} $name "${template}" $rotation 0.5 cwp  # call the matching program corresponding to the level
+	    ./matching_${level} $name "${template}" $rotation $threshold cwp  # call the matching program corresponding to the level
 	    x=1
 	else
-	    ./matching_${level} $name "${template}" $rotation 0.5 wp  # call the matching program corresponding to the level
+	    ./matching_${level} $name "${template}" $rotation $threshold wp  # call the matching program corresponding to the level
 	fi
     done
     echo ""

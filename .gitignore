@@ -2,6 +2,7 @@ advanced_programming_signal_processing/imgproc/*
 advanced_programming_signal_processing/result/*
 .*
 advanced_programming_signal_processing/matching_level*
+advanced_programming_signal_processing/result.txt
 
 
 ## Ignore Visual Studio temporary files, build results, and
