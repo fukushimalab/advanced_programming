@@ -26,6 +26,7 @@ void freeImage(Image *img);
 Image *createImage(const int width, const int height, const int channels);
 Image *cloneImage(const Image *src);
 Image *readPXM(const char *name);
+Image *rotateImage(const Image *src, const int angle);
 void writePXM(const char *name, Image *src);
 void cvtColorGray(const Image *src, Image *dest);
 void drawRectangle(Image *src, const Point pt, const int template_width, const int template_height);
