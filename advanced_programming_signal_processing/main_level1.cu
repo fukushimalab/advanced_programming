@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <unistd.h>
 #include <glob.h>
 
 __global__ void kernelGray(Image src, Image templ, Point *position, double *distance, int *is_found)
@@ -79,8 +78,6 @@ void templateMatchingGray(Image *src, Image *templ, Point *position, double *dis
 	cudaMemcpy(distance, d_distance, sizeof(double), cudaMemcpyDeviceToHost);
 	cudaMemcpy(position, d_position, sizeof(Point), cudaMemcpyDeviceToHost);
 	cudaMemcpy(is_found, d_is_found, sizeof(int), cudaMemcpyDeviceToHost);
-
-	printf("%s distance: %lf\n", __func__, distance);
 
 	// GPUメモリの解放
 	cudaFree(d_img.data);
@@ -161,7 +158,7 @@ void templateMatchingColor(Image *src, Image *templ, Point *position, double *di
 		return;
 	}
 
-	int BLOCK_SIZE = 16;
+	int BLOCK_SIZE = 32;
 	dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
 	dim3 dimGrid((src->width - templ->width + dimBlock.x - 1) / dimBlock.x, (src->height - templ->width + dimBlock.y - 1) / dimBlock.y);
 
@@ -178,8 +175,6 @@ void templateMatchingColor(Image *src, Image *templ, Point *position, double *di
 	cudaMemcpy(distance, d_distance, sizeof(double), cudaMemcpyDeviceToHost);
 	cudaMemcpy(position, d_position, sizeof(Point), cudaMemcpyDeviceToHost);
 	cudaMemcpy(is_found, d_is_found, sizeof(int), cudaMemcpyDeviceToHost);
-
-	printf("%s distance: %lf\n", __func__, distance);
 
 	// GPUメモリの解放
 	cudaFree(d_img.data);
@@ -211,9 +206,6 @@ __device__ int isMatchColor(Image *src, Image *templ, int x, int y)
 // test/beach3.ppm template /airgun_women_syufu.ppm 0 0.5 cwp
 int level1(char *input_file, char *templ_file, int rotation, double threshold, char *options)
 {
-	CalcTime t;
-	// 初期化
-	t.start();
 
 	char output_name_base[256];
 	char output_name_txt[256];
@@ -248,13 +240,8 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 	double distance = INT_MAX;
 	int is_found = 0;
 	// 初期化終了
-	t.end();
-	printf("画像：%s\n", input_file);
-	printf("テンプレートファイル：%s\n", templ_file);
-	printf("初期化. %5.2lf[ms]\n", t.getAvgTime(false));
 
 	// テンプレートマッチング開始
-	t.start();
 
 	// cudaMalloc((void **)&d_img, sizeof(Image));
 	// cudaMalloc((void **)&d_templ, sizeof(Image));
@@ -276,15 +263,9 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 	{
 		// テンプレートマッチング
 		templateMatchingColor(img, templ, &result, &distance, &is_found);
-		printf("%s distance: %lf\n", __func__, distance);
-		printf("%s is found: %d\n", __func__, is_found);
 	}
-	// テンプレートマッチング終了
-	t.end();
-	printf("メイン. %5.2lf[ms]\n", t.getAvgTime(false));
 
 	// 後処理開始
-	t.start();
 	if (is_found)
 	{
 		writeResult(output_name_txt, getBaseName(templ_file), result, templ->width, templ->height, rotation, distance);
@@ -294,8 +275,6 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 		}
 		if (isWriteImageResult)
 		{
-			printf("result x: %d\n", result.x);
-			printf("result y: %d\n", result.y);
 			drawRectangle(img, result, templ->width, templ->height);
 
 			if (img->channel == 3)
@@ -317,10 +296,6 @@ int level1(char *input_file, char *templ_file, int rotation, double threshold, c
 	freeImage(templ);
 
 	// 後処理終了
-	t.end();
-	printf("後処理. %5.2lf[ms]\n", t.getAvgTime(false));
-
-	printf("\n");
 
 	return 0;
 }
@@ -332,7 +307,6 @@ void process_image(char *image, char *level)
 	char *name = (char *)malloc(256);
 	strcpy(name, "imgproc/");
 	strcat(name, bname);
-	printf("name: %s\n", name);
 
 	int rotation = 0;
 
@@ -361,9 +335,6 @@ void process_image(char *image, char *level)
 
 int main(int argc, char *argv[])
 {
-	char pathname[256];
-	getcwd(pathname, 256);
-	printf("pathname: %s\n", pathname);
 	char *level = argv[1];
 	glob_t glob_result;
 
@@ -375,7 +346,6 @@ int main(int argc, char *argv[])
 	for (unsigned int i = 0; i < glob_result.gl_pathc; ++i)
 	{
 		char *image = glob_result.gl_pathv[i];
-		printf("image: %s\n", image);
 		process_image(image, level);
 	}
 	globfree(&glob_result);
