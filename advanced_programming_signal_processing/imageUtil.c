@@ -193,13 +193,13 @@ char* getBaseName(const char* name)
 
 	for (i = 0; i < count; i++)
 	{
-		ret = strchr(ret, '/');
+		ret = strchr(ret, '/') + 1;
 	}
 
 	char* ppt;
 	if ((ppt = strchr(ret, '.')) != NULL) *ppt = '\0';
 
-	return ret + 1;
+	return ret;
 }
 
 void writeResult(const char* file_name, const char* template_name, const Point result, const int width, const int height, const int rotation, const double distance)
