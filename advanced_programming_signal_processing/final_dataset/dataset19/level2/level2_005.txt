@@ -1,0 +1,1 @@
+bird_fukurou_run 226 495 64 64 0

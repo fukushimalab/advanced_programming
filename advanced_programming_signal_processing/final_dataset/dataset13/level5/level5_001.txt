@@ -1,0 +1,1 @@
+money_bitcoin_whale 185 350 64 64 0

@@ -1,0 +1,1 @@
+asobu_cat_shadow 220 84 32 32 0
