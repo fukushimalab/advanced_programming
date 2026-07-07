@@ -63,14 +63,21 @@ sh answer.sh result level1
 
 
 ## 最終テスト用データセット 
-(最終テスト用のデータセット)[https://github.com/fukushimalab/advanced_programming_dataset]
+[最終テスト用のデータセット個別ダウンロード用](https://github.com/fukushimalab/advanced_programming_dataset)
+[最終テスト用のデータセット全体クローン用](https://github.com/fukushimalab/advanced_programming_dataset)
 
-データセットが20種類で合計1.67GBあるため本体から分離しています．
-finalにコピーして使ってください．
+データセットが20種類で合計1.67GBもあるため本体から分離しています．
+基本的には個別ダウンロード用からここにダウンロードして使ってください．
+CSEではなく個人PCに入れていて容量に余裕がある場合は全体クローンをしてもよいです．
+
+使用時はfinalにコピーして使ってください．
 どれでテストするかは，テストの当日に発表します．
 
-なお，各画像はpngで圧縮されています．
-適切に処理してください．
+なお，各画像はpngで圧縮されています．テンプレートマッチングの関数はppmのみに対応しているので適切に処理してください．
+* pngをppmにしたり
+* imagemagickの呼び出しを工夫したり
+* OpenCV使ってpngを読めるようにしたり
+* libpngを使えるようにしたり
 
 なおデータセット1だけはgoogleドライブに別途上げています．
 https://drive.google.com/file/d/1SH5ki2y2cwqAgNfPCvu9Z5a-MigWFUk8/view?usp=sharing
