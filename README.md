@@ -63,8 +63,8 @@ sh answer.sh result level1
 
 
 ## 最終テスト用データセット 
-[最終テスト用のデータセット個別ダウンロード用](https://github.com/fukushimalab/advanced_programming_dataset)
-[最終テスト用のデータセット全体クローン用](https://github.com/fukushimalab/advanced_programming_dataset)
+* [最終テスト用のデータセット個別ダウンロード用](https://github.com/fukushimalab/advanced_programming_dataset)
+* [最終テスト用のデータセット全体クローン用](https://github.com/fukushimalab/advanced_programming_dataset)
 
 データセットが20種類で合計1.67GBもあるため本体から分離しています．
 基本的には個別ダウンロード用からここにダウンロードして使ってください．
